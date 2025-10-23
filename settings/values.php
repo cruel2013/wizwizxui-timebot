@@ -310,6 +310,7 @@ $buttonValues = [
     'cart_to_cart'=>"💳 کارت به کارت",
     'now_payment_gateway'=>"💳 درگاه NowPayment",
     'zarinpal_gateway'=> "💳 درگاه زرین پال",
+    'aqaye_pardakht_gateway'=> "💳 درگاه آقای پرداخت",
     'nextpay_gateway'=>"💳 درگاه نکست پی",
     'weswap_gateway'=>"💳 درگاه ارزی ریالی",
     'approve' => 'تایید ✅',

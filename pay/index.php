@@ -5,7 +5,7 @@ include '../config.php';
 
 //====================//  Get  //==============================
 $hash_id = $_GET['hash_id'];
-if(!isset($_GET['zarinpal']) && !isset($_GET['nowpayment']) && !isset($_GET['nextpay'])){
+if(!isset($_GET['zarinpal']) && !isset($_GET['nowpayment']) && !isset($_GET['nextpay']) && !isset($_GET['aqaye_pardakht'])){
     showForm("درگاه پرداخت شناسایی نشد!");
     exit();
 }
@@ -165,6 +165,37 @@ if(mysqli_num_rows($payInfo)==0){
         }
         
         
+    }
+    elseif(isset($_GET['aqaye_pardakht'])){
+        $CallbackURL = $botUrl . "pay/back.php?aqaye_pardakht&hash_id=$hash_id";
+
+        $data = array(
+            'pin'   => $paymentKeys['aqaye_pardakht'],
+            'amount' => $amount,
+            'callback' => $CallbackURL,
+            'description' => $type
+            );
+
+        $data = json_encode($data);
+        $ch = curl_init('https://aqayepardakht.ir/api/v2/create');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen($data)));
+        $result = curl_exec($ch);
+        curl_close($ch);
+        $result = json_decode($result);
+
+        if ($result->status == 'success') {
+            $transId = $result->transid;
+            $stmt = $connection->prepare("UPDATE `pays` SET `payid` = ? WHERE `hash_id` = ?");
+            $stmt->bind_param("ss", $transId, $hash_id);
+            $stmt->execute();
+            $stmt->close();
+            header('Location: https://aqayepardakht.ir/startpay/'. $transId);
+        } else {
+            showForm($result->message);
+        }
     }
 }
 

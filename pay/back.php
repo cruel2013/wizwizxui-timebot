@@ -163,6 +163,67 @@ if(mysqli_num_rows($payInfo)==0){
     }
 }
 }
+elseif(isset($_GET['aqaye_pardakht'])){
+    $hash_id = $_GET['hash_id'];
+    $stmt = $connection->prepare("SELECT * FROM `pays` WHERE `hash_id` = ? AND (`state` = 'pending' OR `state` = 'send')");
+    $stmt->bind_param("s", $hash_id);
+    $stmt->execute();
+    $payInfo = $stmt->get_result();
+    $stmt->close();
+
+    if(mysqli_num_rows($payInfo)==0){
+        showForm("کد پرداخت یافت نشد","خطا!");
+    }else{
+        $payParam = $payInfo->fetch_assoc();
+        $rowId = $payParam['id'];
+        $amount = $payParam['price'];
+        $transId = $payParam['payid'];
+
+        if ($_POST['status'] == 1) {
+            $data = array(
+                'pin' => $paymentKeys['aqaye_pardakht'],
+                'amount' => $amount,
+                'transid' => $transId
+            );
+            $data = json_encode($data);
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, 'https://aqayepardakht.ir/api/v2/verify');
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Content-Length: ' . strlen($data)));
+            $result = curl_exec($ch);
+            $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            $result = json_decode($result);
+
+            if ($httpcode == 200) {
+                if ($result->status == 'success') {
+                    doAction($rowId, "aqaye_pardakht");
+                } else {
+                    $stmt = $connection->prepare("UPDATE `pays` SET `state` = 'canceled' WHERE `hash_id` = ?");
+                    $stmt->bind_param("s", $hash_id);
+                    $stmt->execute();
+                    $stmt->close();
+                    showForm("پرداخت شما انجام نشد!","درگاه آقای پرداخت");
+                }
+            }else{
+                $stmt = $connection->prepare("UPDATE `pays` SET `state` = 'canceled' WHERE `hash_id` = ?");
+                $stmt->bind_param("s", $hash_id);
+                $stmt->execute();
+                $stmt->close();
+                showForm("تراکنش ناموفق بود","درگاه آقای پرداخت");
+            }
+        } else {
+            $stmt = $connection->prepare("UPDATE `pays` SET `state` = 'canceled' WHERE `hash_id` = ?");
+            $stmt->bind_param("s", $hash_id);
+            $stmt->execute();
+            $stmt->close();
+
+            showForm("پرداخت شما انجام نشد!","درگاه آقای پرداخت");
+        }
+    }
+}
 else{
 showForm("درگاه پرداخت شناسایی نشد","خطا!");
 exit();
@@ -194,9 +255,9 @@ if($payType == "BUY_SUB") $payDescription = "خرید اشتراک";
 elseif($payType == "RENEW_ACCOUNT") $payDescription = "تمدید اکانت";
 elseif($payType == "INCREASE_WALLET") $payDescription ="شارژ کیف پول";
 elseif(preg_match('/^INCREASE_DAY_(\d+)_(\d+)/',$payType)) $payDescription = "افزایش زمان اکانت";
-elseif(preg_match('/^INCREASE_VOLUME_(\d+)_(\d+)/',$payType)) $payDescription = "افزایش حجم اکانت";    
+elseif(preg_match('/^INCREASE_VOLUME_(\d+)_(\d+)/',$payType)) $payDescription = "افزایش حجم اکانت";
 
-if($gateType == "zarinpal" || $gateType == "nextpay") $payDescription = "خرید اشتراک";
+if($gateType == "zarinpal" || $gateType == "nextpay" || $gateType == "aqaye_pardakht") $payDescription = "خرید اشتراک";
 
 $stmt = $connection->prepare("UPDATE `pays` SET `state` = 'paid' WHERE `id` =?");
 $stmt->bind_param("i", $payRowId);

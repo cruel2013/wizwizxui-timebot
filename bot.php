@@ -201,6 +201,34 @@ if(($data=="gateWays_Channels" or preg_match("/^changeGateWays(\w+)/",$data,$mat
     }
     editText($message_id,$mainValues['change_bot_settings_message'],getGateWaysKeys());
 }
+if(preg_match('/^changePaymentKeys(\w+)/',$data,$match) && ($from_id == $admin || $userInfo['isAdmin'] == true)){
+    delMessage();
+    switch($match[1]){
+        case "nextpay":
+            $gate = "کد جدید درگاه نکست پی";
+            break;
+        case "nowpayment":
+            $gate = "کد جدید درگاه nowPayment";
+            break;
+        case "zarinpal":
+            $gate = "کد جدید درگاه زرین پال";
+            break;
+        case "aqaye_pardakht":
+            $gate = "کد جدید درگاه آقای پرداخت";
+            break;
+        case "bankAccount":
+            $gate = "شماره حساب جدید";
+            break;
+        case "holderName":
+            $gate = "اسم دارنده حساب";
+            break;
+        case "tronwallet":
+            $gate = "آدرس والت ترون";
+            break;
+    }
+    sendMessage("🔘|لطفا $gate را وارد کنید", $cancelKey);
+    setUser($data);
+}
 if($data=="changeConfigRemarkType"){
     switch($botState['remark']){
         case "digits":
@@ -770,6 +798,7 @@ if($userInfo['step'] == "increaseMyWallet" && $text != $buttonValues['cancel']){
     if($botState['cartToCartState'] == "on") $keyboard[] = [['text' => $buttonValues['cart_to_cart'],  'callback_data' => "increaseWalletWithCartToCart" . $hash_id]];
     if($botState['nowPaymentWallet'] == "on") $keyboard[] = [['text' => $buttonValues['now_payment_gateway'],  'url' => $botUrl . "pay/?nowpayment&hash_id=" . $hash_id]];
     if($botState['zarinpal'] == "on") $keyboard[] = [['text' => $buttonValues['zarinpal_gateway'],  'url' => $botUrl . "pay/?zarinpal&hash_id=" . $hash_id]];
+    if($botState['aqaye_pardakht'] == "on") $keyboard[] = [['text' => $buttonValues['aqaye_pardakht_gateway'],  'url' => $botUrl . "pay/?aqaye_pardakht&hash_id=" . $hash_id]];
     if($botState['nextpay'] == "on") $keyboard[] = [['text' => $buttonValues['nextpay_gateway'],  'url' => $botUrl . "pay/?nextpay&hash_id=" . $hash_id]];
     if($botState['weSwapState'] == "on") $keyboard[] = [['text' => $buttonValues['weswap_gateway'],  'callback_data' => "payWithWeSwap" . $hash_id]];
     if($botState['tronWallet'] == "on") $keyboard[] = [['text' => $buttonValues['tron_gateway'],  'callback_data' => "payWithTronWallet" . $hash_id]];
@@ -2616,6 +2645,7 @@ if((preg_match('/^discountCustomPlanDay(\d+)/',$userInfo['step'], $match) || pre
     if($botState['cartToCartState'] == "on") $keyboard[] = [['text' => $buttonValues['cart_to_cart'],  'callback_data' => "payCustomWithCartToCart$hash_id"]];
     if($botState['nowPaymentOther'] == "on") $keyboard[] = [['text' => $buttonValues['now_payment_gateway'],  'url' => $botUrl . "pay/?nowpayment&hash_id=" . $hash_id]];
     if($botState['zarinpal'] == "on") $keyboard[] = [['text' => $buttonValues['zarinpal_gateway'],  'url' => $botUrl . "pay/?zarinpal&hash_id=" . $hash_id]];
+    if($botState['aqaye_pardakht'] == "on") $keyboard[] = [['text' => $buttonValues['aqaye_pardakht_gateway'],  'url' => $botUrl . "pay/?aqaye_pardakht&hash_id=" . $hash_id]];
     if($botState['nextpay'] == "on") $keyboard[] = [['text' => $buttonValues['nextpay_gateway'],  'url' => $botUrl . "pay/?nextpay&hash_id=" . $hash_id]];
     if($botState['weSwapState'] == "on") $keyboard[] = [['text' => $buttonValues['weswap_gateway'],  'callback_data' => "payWithWeSwap" . $hash_id]];
     if($botState['walletState'] == "on") $keyboard[] = [['text' => $buttonValues['pay_with_wallet'],  'callback_data' => "payCustomWithWallet$hash_id"]];
@@ -2839,6 +2869,7 @@ if((preg_match('/^discountSelectPlan(\d+)_(\d+)_(\d+)/',$userInfo['step'],$match
         if($botState['cartToCartState'] == "on") $keyboard[] = [['text' => $buttonValues['cart_to_cart'],  'callback_data' => "payWithCartToCart$hash_id"]];
         if($botState['nowPaymentOther'] == "on") $keyboard[] = [['text' => $buttonValues['now_payment_gateway'],  'url' => $botUrl . "pay/?nowpayment&hash_id=" . $hash_id]];
         if($botState['zarinpal'] == "on") $keyboard[] = [['text' => $buttonValues['zarinpal_gateway'],  'url' => $botUrl . "pay/?zarinpal&hash_id=" . $hash_id]];
+        if($botState['aqaye_pardakht'] == "on") $keyboard[] = [['text' => $buttonValues['aqaye_pardakht_gateway'],  'url' => $botUrl . "pay/?aqaye_pardakht&hash_id=" . $hash_id]];
         if($botState['nextpay'] == "on") $keyboard[] = [['text' => $buttonValues['nextpay_gateway'],  'url' => $botUrl . "pay/?nextpay&hash_id=" . $hash_id]];
         if($botState['weSwapState'] == "on") $keyboard[] = [['text' => $buttonValues['weswap_gateway'],  'callback_data' => "payWithWeSwap" . $hash_id]];
         if($botState['walletState'] == "on") $keyboard[] = [['text' => $buttonValues['pay_with_wallet'],  'callback_data' => "payWithWallet$hash_id"]];

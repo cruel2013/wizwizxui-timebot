@@ -845,6 +845,7 @@ function getGateWaysKeys(){
     $tronWallet = $botState['tronWallet']=="on"?$buttonValues['on']:$buttonValues['off'];
     $zarinpal = $botState['zarinpal']=="on"?$buttonValues['on']:$buttonValues['off'];
     $nextpay = $botState['nextpay']=="on"?$buttonValues['on']:$buttonValues['off'];
+    $aqaye_pardakht = $botState['aqaye_pardakht']=="on"?$buttonValues['on']:$buttonValues['off'];
     $rewaredChannel = $botState['rewardChannel']??" ";
     $lockChannel = $botState['lockChannel']??" ";
 
@@ -876,6 +877,10 @@ function getGateWaysKeys(){
             ['text'=>"کد درگاه نکست پی",'callback_data'=>"wizwizch"]
         ],
         [
+            ['text'=>(!empty($paymentKeys['aqaye_pardakht'])?$paymentKeys['aqaye_pardakht']:" "),'callback_data'=>"changePaymentKeysaqaye_pardakht"],
+            ['text'=>"کد درگاه آقای پرداخت",'callback_data'=>"wizwizch"]
+        ],
+        [
             ['text'=>(!empty($paymentKeys['tronwallet'])?$paymentKeys['tronwallet']:" "),'callback_data'=>"changePaymentKeystronwallet"],
             ['text'=>"آدرس والت ترون",'callback_data'=>"wizwizch"]
         ],
@@ -894,6 +899,10 @@ function getGateWaysKeys(){
         [
             ['text'=>$zarinpal,'callback_data'=>"changeGateWayszarinpal"],
             ['text'=>"درگاه زرین پال",'callback_data'=>"wizwizch"]
+        ],
+        [
+            ['text'=>$aqaye_pardakht,'callback_data'=>"changeGateWaysaqaye_pardakht"],
+            ['text'=>"درگاه آقای پرداخت",'callback_data'=>"wizwizch"]
         ],
         [
             ['text'=>$nowPaymentWallet,'callback_data'=>"changeGateWaysnowPaymentWallet"],
